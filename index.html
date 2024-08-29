@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            background-color: #FFFACD; 
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #333;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            transition: width 0.3s;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .sidebar.collapsed .menu-item span {
+            display: none;
+        }
+        .sidebar.collapsed .menu-item::before {
+            content: attr(data-icon);
+        }
+        .sidebar h2 {
+            margin: 0;
+            padding: 20px 0;
+        }
+        .menu-item {
+            cursor: pointer;
+            padding: 10px;
+            margin: 5px;
+            width: 100%;
+            text-align: left;
+            background-color: #FF8C00;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .menu-item:hover {
+            background-color: #555;
+        }
+        .menu-item span {
+            margin-left: 10px;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            transition: margin-left 0.3s;
+        }
+        .main-content.collapsed {
+            margin-left: 70px;
+        }
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        .content-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .toggle-button {
+            position: absolute;
+            top: 20px;
+            left: 270px;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 10px;
+            background-color: #444;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: left 0.3s;
+        }
+        .toggle-button.collapsed {
+            left: 90px;
+        }
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        .typewriter {
+            font-size: 3.5em;
+            font-family: Lucida;
+            overflow: hidden;
+            border-right: .15em solid #000;
+            white-space: nowrap;
+            margin: 0 auto;
+            text-align: center;
+            letter-spacing: .20em;
+            animation: typing 5.5s steps(20, end), blink .100s step-end;
+            display: inline-block;
+            width: auto; /* Adjust the width to fit the text */
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Menu</h2>
+        <div class="menu-item" data-icon="📋" onclick="showSection('patients')">
+            <span>Patients</span>
+        </div>
+        <div class="menu-item" data-icon="🩺" onclick="showSection('doctors')">
+            <span>Doctors</span>
+        </div>
+        <div class="menu-item" data-icon="📅" onclick="showSection('appointments')">
+            <span>Appointments</span>
+        </div>
+        <div class="menu-item" data-icon="🏥" onclick="showSection('departments')">
+            <span>Departments</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <button class="toggle-button" onclick="toggleSidebar()">☰</button>
+
+        <h1 class='typewriter'>Gracelly  Care-Home</h1>
+
+        <div id="patients" class="content-section">
+            <h2>Patients</h2>
+            <a href="{% url 'patient_create' %}">Add New Patient</a>
+            <ul>
+                {% for patient in patients %}
+                <li>{{ patient.name }} - <a href="{% url 'patient_update' patient.pk %}">Edit</a> - <a href="{% url 'patient_delete' patient.pk %}">Delete</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div id="doctors" class="content-section">
+            <h2>Doctors</h2>
+            <a href="{% url 'doctor_create' %}">Add New Doctor</a>
+            <ul>
+                {% for doctor in doctors %}
+                <li>{{ doctor.name }} - <a href="{% url 'doctor_update' doctor.pk %}">Edit</a> - <a href="{% url 'doctor_delete' doctor.pk %}">Delete</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div id="appointments" class="content-section">
+            <h2>Appointments</h2>
+            <a href="{% url 'appointment_create' %}">Add New Appointment</a>
+            <ul>
+                {% for appointment in appointments %}
+                <li>{{ appointment.patient.name }} with {{ appointment.doctor.name }} on {{ appointment.date }} - <a href="{% url 'appointment_update' appointment.pk %}">Edit</a> - <a href="{% url 'appointment_delete' appointment.pk %}">Delete</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div id="departments" class="content-section">
+            <h2>Departments</h2>
+            <a href="{% url 'department_create' %}">Add New Department</a>
+            <ul>
+                {% for department in departments %}
+                <li>{{ department.name }} - <a href="{% url 'department_update' department.pk %}">Edit</a> - <a href="{% url 'department_delete' department.pk %}">Delete</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            var sections = document.getElementsByClassName('content-section');
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].classList.remove('active');
+            }
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        function toggleSidebar() {
+            var sidebar = document.querySelector('.sidebar');
+            var mainContent = document.querySelector('.main-content');
+            var toggleButton = document.querySelector('.toggle-button');
+
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('collapsed');
+            toggleButton.classList.toggle('collapsed');
+        }
+
+        // Show the first section by default
+        showSection('patients');
+    </script>
+</body>
+</html>
