@@ -1,0 +1,8 @@
+
+<h2>Delete Appointment</h2>
+<p>Are you sure you want to delete the appointment of {{ appointment.patient.name }} with {{ appointment.doctor.name }} on {{ appointment.date }}?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+</form>
+
